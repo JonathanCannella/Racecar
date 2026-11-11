@@ -1,0 +1,148 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6593039106618376810
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1112919272813828628}
+  - component: {fileID: 4426257712056041509}
+  - component: {fileID: 1373581344357570875}
+  - component: {fileID: 5800445983132880609}
+  - component: {fileID: 3098157174219148}
+  m_Layer: 0
+  m_Name: RacecarNNAgent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1112919272813828628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6593039106618376810}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4426257712056041509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6593039106618376810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 0
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 2
+      BranchSizes: 
+    VectorActionSize: 02000000
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 0
+  m_BehaviorType: 0
+  m_BehaviorName: Racecar
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_DeterministicInference: 0
+  m_ObservableAttributeHandling: 0
+--- !u!114 &1373581344357570875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6593039106618376810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3738faad582bd6a43a30d1c0030a5ad4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
+  wipeoutEndsEpisode: 0
+  EpisodeLenSec: 360
+  observationScales: []
+  DB_RewardTotal: 0
+--- !u!114 &5800445983132880609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6593039106618376810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69434b931d224f278330b1e2b09f885b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  record: 0
+  demonstrationName: Racecar
+  outputDirectory: 
+  durationSeconds: 600
+  stopWhenDone: 1
+  teacherMaxSpeedKph: 0
+  forcedResets: 1
+  minResetInterval: 6
+  maxResetInterval: 30
+  perturbedResetFraction: 0.5
+  maxLateralOffsetFraction: 0.5
+  maxHeadingOffsetDeg: 15
+  steeringNoiseStd: 0.1
+  throttleNoiseStd: 0.1
+  noiseHoldSeconds: 0.25
+  steeringNoiseFullUntilKph: 100
+  chunkSeconds: 5
+  dropSecondsBeforeWipeout: 6
+  dropStruggling: 1
+  struggleToleranceSeconds: 0.5
+  randomSeed: 0
+  SegmentsKept: 0
+  SegmentsDropped: 0
+  DecisionsKept: 0
+  Wipeouts: 0
+  SecondsKept: 0
+  SecondsDroppedForWipeouts: 0
+  SecondsDroppedForStruggling: 0
+  ElapsedSeconds: 0
+  Done: 0
+--- !u!114 &3098157174219148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6593039106618376810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cec6e86daa3a4a1dadd84ae5031fb8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rewindFraction: 0
+  rewindMinMeters: 60
+  rewindMaxFailures: 3
+  onlyWhenTraining: 1
+  Wipeouts: 0
+  Rewinds: 0

@@ -1,0 +1,45 @@
+# Phase 2 (reinforcement learning): start from the imitation policy and improve on it with your reward alone
+# (no demonstrations), e.g. to go faster than your FuzzyVehicle.
+#   Tools/ml/nntools train --config Tools/ml/config/Racecar_rl_after_imitation.yaml --mode headless --num-envs 4 \
+#       --scene auto --run-id rl -- --initialize-from imitation
+# Evaluate checkpoints as you go (results/rl/Racecar/Racecar-<step>.onnx): progress is not steady, and a policy can
+# get worse again after improving; keep the best one. A smaller learning rate changes the policy more gently.
+behaviors:
+  Racecar:
+    trainer_type: ppo
+    # --initialize-from starts from the imitation run's last checkpoint. To start from an earlier one that tested
+    # better, name its file in results/<imitation run-id>/Racecar/:
+    # init_path: Racecar-299981.pt
+    hyperparameters:
+      batch_size: 2048
+      buffer_size: 20480
+      learning_rate: 1.0e-4
+      beta: 1.0e-3
+      epsilon: 0.15
+      lambd: 0.99
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      # Off: NNVehicle scales observations with fixed observationScales (running normalization drifts)
+      normalize: false
+      hidden_units: 256
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        gamma: 0.998
+        strength: 1.0
+    # Usually best somewhere in the first 1-1.5M steps; after that it tends to trade safety in turns for speed on
+    # straights. To train longer, raise this and keep comparing checkpoints (nntools test --nn --run ...).
+    max_steps: 1500000
+    time_horizon: 256
+    summary_freq: 20000
+    keep_checkpoints: 40
+    checkpoint_interval: 100000
+# Read at the start of every episode, so changing them needs no rebuild: wipeout_ends_episode by NNVehicle,
+# rewind_fraction by WipeoutRewind. Add your own reward settings here (e.g. my_setting: 1.0) and read them in
+# NNVehicle.OnEpisodeBegin().
+environment_parameters:
+  wipeout_ends_episode: 0
+  # Half of the wipeouts put the car back a little before the mistake (WipeoutRewind on the RacecarNNAgent
+  # prefab), so hard spots get practiced much more often. 0 = off.
+  rewind_fraction: 0.5

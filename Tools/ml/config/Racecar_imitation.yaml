@@ -1,0 +1,44 @@
+# Phase 1 (imitation): learn to drive like your FuzzyVehicle from recorded demonstrations.
+# Record first (all tracks, headless; check the teacher report):
+#   Tools/ml/nntools record --name Racecar          -> Demonstrations/Racecar
+#   Tools/ml/nntools train --config Tools/ml/config/Racecar_imitation.yaml --mode headless --num-envs 4 \
+#       --scene auto --run-id imitation
+# Behavioral cloning copies the demonstrated actions; GAIL rewards driving that looks like the demonstrations. There is
+# no task (extrinsic) reward: this phase learns from your FuzzyVehicle alone, so it works before you have designed a
+# reward, and the reward printed while it trains (your NNVehicle's, if any) is not used. Judge it by testing
+# checkpoints (nntools test --nn --run imitation), then continue with Racecar_rl_after_imitation.yaml.
+# If you change NNVehicle's observations, record new demonstrations (they store observations).
+behaviors:
+  Racecar:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 1024
+      buffer_size: 10240
+      learning_rate: 3.0e-4
+      beta: 5.0e-3
+      epsilon: 0.2
+      lambd: 0.95
+      num_epoch: 3
+      learning_rate_schedule: constant
+    network_settings:
+      # Off: NNVehicle scales observations with fixed observationScales (running normalization drifts)
+      normalize: false
+      hidden_units: 256
+      num_layers: 2
+    reward_signals:
+      gail:
+        strength: 0.1
+        demo_path: Demonstrations/Racecar
+    behavioral_cloning:
+      demo_path: Demonstrations/Racecar
+      strength: 0.5
+      steps: 400000
+    # Stop when behavioral cloning does: in testing, the policy got clearly worse in the steps after cloning ended, and
+    # phase 2 (--initialize-from) starts from the last checkpoint.
+    max_steps: 400000
+    time_horizon: 256
+    summary_freq: 20000
+    keep_checkpoints: 20
+    checkpoint_interval: 50000
+environment_parameters:
+  wipeout_ends_episode: 1

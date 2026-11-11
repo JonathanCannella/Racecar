@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# NN training tools (macOS / Linux): build, record, train. See Tools/ml/nntools.py or `Tools/ml/nntools --help`.
+# Uses the ML-Agents virtual environment (Tools/ml/setup_mlagents_env.sh); VENV=... to use another one.
+set -euo pipefail
+PROJECT="$(cd "$(dirname "$0")/../.." && pwd)"
+VENV="${VENV:-$PROJECT/.venv-mlagents}"
+if [ ! -x "$VENV/bin/python" ]; then
+  echo "ML-Agents environment not found at $VENV. Run Tools/ml/setup_mlagents_env.sh first." >&2
+  exit 1
+fi
+exec "$VENV/bin/python" "$PROJECT/Tools/ml/nntools.py" "$@"

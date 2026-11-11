@@ -1,0 +1,40 @@
+# Trainer configuration for the NN racecar (behavior name "Racecar" on the RacecarNNAgent prefab):
+# reinforcement learning only (no demonstrations). With a decent FuzzyVehicle, imitation first usually gets a
+# driving policy much sooner: see Racecar_imitation.yaml, then Racecar_rl_after_imitation.yaml.
+#   Tools/ml/nntools train --config Tools/ml/config/Racecar.yaml --mode headless --num-envs 4 --scene auto --run-id rl
+# Settings: https://docs.unity3d.com/Packages/com.unity.ml-agents@4.1/manual/Training-Configuration-File.html
+behaviors:
+  Racecar:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 1024
+      buffer_size: 10240
+      learning_rate: 3.0e-4
+      beta: 5.0e-3
+      epsilon: 0.2
+      # How far back credit for a reward reaches through real experience (vs. the value estimate). Higher helps
+      # the agent connect e.g. braking early with the speed it carries out of the turn seconds later.
+      lambd: 0.99
+      num_epoch: 3
+      learning_rate_schedule: linear
+    network_settings:
+      # Off: NNVehicle scales observations with fixed observationScales (running normalization drifts)
+      normalize: false
+      hidden_units: 256
+      num_layers: 2
+    reward_signals:
+      extrinsic:
+        # Discount: rewards about 1 / (1 - gamma) decisions ahead still count (0.998 at 30 decisions/s: ~17 s)
+        gamma: 0.998
+        strength: 1.0
+    max_steps: 3000000
+    time_horizon: 256
+    summary_freq: 20000
+    # Keep many checkpoints: later is not always better (see the assignment guidelines)
+    keep_checkpoints: 40
+    checkpoint_interval: 100000
+# Read at the start of every episode, so changing them needs no rebuild: wipeout_ends_episode by NNVehicle,
+# rewind_fraction by WipeoutRewind. Add your own reward settings here (e.g. my_setting: 1.0) and read them in
+# NNVehicle.OnEpisodeBegin().
+environment_parameters:
+  wipeout_ends_episode: 0
