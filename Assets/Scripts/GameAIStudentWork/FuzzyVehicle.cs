@@ -65,7 +65,17 @@ namespace GameAI
             // set = GenerateCrossfadeFuzzySet<FzInputSpeed>( ... );
             // replace the following:
 
-            set = new FuzzySet<FzInputSpeed>();
+            // Slow
+            const float slow = 10f;
+
+            // Medium
+            const float medium = 25f;
+
+            // Fast
+            const float fast = 50f;
+
+            //set = new FuzzySet<FzInputSpeed>();
+            set = GenerateCrossfadeFuzzySet<FzInputSpeed>(slow, medium, fast);
 
             // You can then print the ASCII visualization for debugging:
             // Debug.Log(RenderFuzzySetAscii(set));
@@ -83,7 +93,18 @@ namespace GameAI
             // set = GenerateDiscreteFuzzySet<FzOutputThrottle>( ... );
             // replace the following:
 
-            set = new FuzzySet<FzOutputThrottle>();
+            // Brake
+            const float brake = -1f;
+
+            // coast
+            const float coast = 0f;
+
+            // accelerate
+            const float accelerate = 1f;
+
+            //set = new FuzzySet<FzOutputThrottle>();
+            set = GenerateDiscreteFuzzySet<FzOutputThrottle>(brake, coast, accelerate);
+
 
             // Use RenderFuzzySetAscii(set) to visualize the shape of your output terms.
 
@@ -142,7 +163,7 @@ namespace GameAI
         {
             base.Awake();
 
-            StudentName = "George P. Burdell";
+            StudentName = "Jonathan Cannella";
 
             // DO NOT INITIALIZE FUZZY STUFF HERE!!! Use Start() instead.
         }
