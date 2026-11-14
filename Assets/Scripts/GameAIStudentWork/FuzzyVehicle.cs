@@ -37,7 +37,9 @@ namespace GameAI
         enum FzOutputWheel { TurnLeft, GoStraight, TurnRight }
 
         enum FzInputSpeed { Slow, Medium, Fast }
+        enum FzInputAim { Left, Straight, Right }
 
+        FuzzySet<FzInputAim> fzAimSet;
         FuzzySet<FzInputSpeed> fzSpeedSet;
 
         FuzzySet<FzOutputThrottle> fzThrottleSet;
@@ -53,6 +55,15 @@ namespace GameAI
         FuzzyValueSet mergedThrottle = new FuzzyValueSet();
         FuzzyValueSet mergedWheel = new FuzzyValueSet();
 
+        // Car Object
+        Vector3 carPosition;
+        Vector3 carForward;
+
+        private void UpdatePosition()
+        {
+            this.carPosition = transform.position;
+            this.carForward = transform.forward;
+        }
 
 
         private FuzzySet<FzInputSpeed> GetSpeedSet()
@@ -122,7 +133,39 @@ namespace GameAI
             // set = GenerateDiscreteFuzzySet<FzOutputWheel>( ... );
             // replace the following:
 
-            set = new FuzzySet<FzOutputWheel>();
+            // left
+            const float left = -1f;
+
+            // straight
+            const float straight = 0f;
+
+            // right
+            const float right = 1f;
+
+            //set = new FuzzySet<FzOutputThrottle>();
+            set = GenerateDiscreteFuzzySet<FzOutputWheel>(left, straight, right);
+
+            // You may test with: Debug.Log(RenderFuzzySetAscii(set));
+
+            return set;
+        }
+
+        // get aimset
+        private FuzzySet<FzInputAim> GetAimSet()
+        {
+            FuzzySet<FzInputAim> set = null;
+
+            // left
+            const float left = -20f;
+
+            // straight
+            const float straight = 0f;
+
+            // right
+            const float right = 20f;
+
+            //set = new FuzzySet<FzOutputThrottle>();
+            set = GenerateDiscreteFuzzySet<FzInputAim>(left, straight, right);
 
             // You may test with: Debug.Log(RenderFuzzySetAscii(set));
 
@@ -147,12 +190,21 @@ namespace GameAI
             return new FuzzyRuleSet<FzOutputThrottle>(throttle, rules);
         }
 
+        // helper to flatten, citing unity docs: https://docs.unity.com/en-us/engine/6000.7/script-reference/unityengine/vector3/projectonplane
+        private Vector3 FlattenVector(Vector3 input)
+        {
+            return Vector3.ProjectOnPlane(input, Vector3.up);
+        }
+
         private FuzzyRuleSet<FzOutputWheel> GetWheelRuleSet(FuzzySet<FzOutputWheel> wheel)
         {
 
             FuzzyRule<FzOutputWheel>[] rules =
             {
                 // TODO: Add some rules.
+                If(FzInputAim.Left).Then(FzOutputWheel.TurnLeft),
+                If(FzInputAim.Straight).Then(FzOutputWheel.GoStraight),
+                If(FzInputAim.Right).Then(FzOutputWheel.TurnRight),
             };
 
             return new FuzzyRuleSet<FzOutputWheel>(wheel, rules);
@@ -174,12 +226,14 @@ namespace GameAI
 
             // TODO: You can initialize a bunch of Fuzzy stuff here like more fuzzy inputs
             fzSpeedSet = this.GetSpeedSet();
+            fzAimSet = this.GetAimSet();
 
             fzThrottleSet = this.GetThrottleSet();
             fzThrottleRuleSet = this.GetThrottleRuleSet(fzThrottleSet);
 
             fzWheelSet = this.GetWheelSet();
             fzWheelRuleSet = this.GetWheelRuleSet(fzWheelSet);
+            UpdatePosition();
         }
 
         System.Text.StringBuilder strBldr = new System.Text.StringBuilder();
@@ -190,18 +244,31 @@ namespace GameAI
 
             // TODO Do all your input fuzzification here and then
             // pass your fuzzy rule sets to ApplyFuzzyRules()
-            
+
             // Remove the following hardcode calls once you get your fuzzy rules working.
             // You can leave one hardcoded while you work on the other.
             // Both steering and throttle must be implemented with variable
-            // control and not fixed/hardcoded!
+            // control and not fixed/hardcoded
 
-            HardCodeSteering(0f);
-            HardCodeThrottle(0.5f);
+            UpdatePosition();
+
+            // Pick taret down track
+            Vector3 target = FlattenVector(Racetrack.GetPointAhead(10f));
+
+            // Get the vectr from car to target and flatten it
+            Vector3 vectorToTarget = target - FlattenVector(carPosition);
+
+            // Get angle
+            float angle = Vector3.SignedAngle(FlattenVector(carForward), vectorToTarget, Vector3.up);
+
+
+            //HardCodeSteering(0f);
+            //HardCodeThrottle(0.5f);
             
             // Simple example of fuzzification of vehicle state
             // The Speed is fuzzified and stored in fzInputValueSet
             fzSpeedSet.Evaluate(Speed, fzInputValueSet);
+            fzAimSet.Evaluate(angle, fzInputValueSet);
 
             // ApplyFuzzyRules evaluates your rules and assigns Thottle and Steering accordingly
             // Also, some intermediate values are passed back for debugging purposes
