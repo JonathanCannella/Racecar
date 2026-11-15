@@ -38,7 +38,9 @@ namespace GameAI
 
         enum FzInputSpeed { Slow, MedSlow, Medium, Fast }
         enum FzInputAim { Left, Straight, Right }
+        enum FzInputTrack { straight, windy, curvy }
 
+        FuzzySet<FzInputTrack> fzTrackSet;
         FuzzySet<FzInputAim> fzAimSet;
         FuzzySet<FzInputSpeed> fzSpeedSet;
 
@@ -76,17 +78,19 @@ namespace GameAI
             // set = GenerateCrossfadeFuzzySet<FzInputSpeed>( ... );
             // replace the following:
 
+            const float sf = 1.2f;
+
             // Slow
-            const float slow = 5f;
+            const float slow = 5f * sf;
 
             // Medium Slow
-            const float medSlow = 15f;
+            const float medSlow = 15f * sf;
 
             // Medium
-            const float medium = 25f;
+            const float medium = 25f * sf;
 
             // Fast
-            const float fast = 50f;
+            const float fast = 50f * sf;
 
             //set = new FuzzySet<FzInputSpeed>();
             set = GenerateCrossfadeFuzzySet<FzInputSpeed>(slow, medSlow, medium, fast);
@@ -158,14 +162,17 @@ namespace GameAI
         {
             FuzzySet<FzInputAim> set = null;
 
+            // aim factor
+            const float af = 16f;
+
             // left
-            const float left = -20f;
+            const float left = -1f * af;
 
             // straight
             const float straight = 0f;
 
             // right
-            const float right = 20f;
+            const float right = 1f * af;
 
             //set = new FuzzySet<FzOutputThrottle>();
             set = GenerateCrossfadeFuzzySet<FzInputAim>(left, straight, right);
@@ -184,10 +191,17 @@ namespace GameAI
                 // TODO: Add some rules. Here is an example
                 // (Note: these aren't necessarily good rules)
                 If(FzInputSpeed.Slow).Then(FzOutputThrottle.Accelerate),
-                If(FzInputSpeed.Medium).Then(FzOutputThrottle.Coast),
+
+                If(And(FzInputSpeed.MedSlow, FzInputAim.Straight)).Then(FzOutputThrottle.Accelerate),
+                If(And(FzInputSpeed.MedSlow, FzInputAim.Left)).Then(FzOutputThrottle.Coast),
+                If(And(FzInputSpeed.MedSlow, FzInputAim.Right)).Then(FzOutputThrottle.Coast),
+
+                //If(FzInputSpeed.MedSlow).Then(FzOutputThrottle.Accelerate),
+                If(And(FzInputSpeed.Medium, FzInputAim.Straight)).Then(FzOutputThrottle.Brake),
+                If(And(FzInputSpeed.Medium, FzInputAim.Left)).Then(FzOutputThrottle.Brake),
+                If(And(FzInputSpeed.Medium, FzInputAim.Right)).Then(FzOutputThrottle.Brake),
+
                 If(FzInputSpeed.Fast).Then(FzOutputThrottle.Brake),
-                // More example syntax
-                //If(And(FzInputSpeed.Fast, Not(FzFoo.Bar)).Then(FzOutputThrottle.Accelerate),
             };
 
             return new FuzzyRuleSet<FzOutputThrottle>(throttle, rules);
@@ -206,7 +220,7 @@ namespace GameAI
             {
                 // TODO: Add some rules.
                 If(FzInputAim.Left).Then(FzOutputWheel.TurnLeft),
-                If(FzInputAim.Straight).Then(FzOutputWheel.GoStraight),
+                If(Very(FzInputAim.Straight)).Then(FzOutputWheel.GoStraight),
                 If(FzInputAim.Right).Then(FzOutputWheel.TurnRight),
             };
 
@@ -215,7 +229,8 @@ namespace GameAI
 
         private float GetAimAngle()
         {
-            Vector3 target = FlattenVector(Racetrack.GetPointAhead(10f));
+            const float lookahead = 12f;
+            Vector3 target = FlattenVector(Racetrack.GetPointAhead(lookahead));
 
             // Get the vectr from car to target and flatten it
             Vector3 vectorToTarget = target - FlattenVector(carPosition);
