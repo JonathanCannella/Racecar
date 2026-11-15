@@ -78,7 +78,7 @@ namespace GameAI
             // set = GenerateCrossfadeFuzzySet<FzInputSpeed>( ... );
             // replace the following:
 
-            const float sf = 1.2f;
+            const float sf = 1.3f;
 
             // Slow
             const float slow = 5f * sf;

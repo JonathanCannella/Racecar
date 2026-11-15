@@ -22,7 +22,7 @@ namespace Tests
     public class RacingTest
     {
 
-        const int timeScale = 20; // simulated time per rendered frame. Higher values draw fewer frames for the same
+        const int timeScale = 50; // simulated time per rendered frame. Higher values draw fewer frames for the same
                                  // 60 Hz physics, so a race can take less time in the Editor with the same results.
 
         const int PlayMatchTimeOutMS = int.MaxValue; // don't mess with this; add it to new tests
