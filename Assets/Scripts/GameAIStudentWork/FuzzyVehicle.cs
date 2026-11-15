@@ -1,5 +1,4 @@
-﻿// compile_check
-// Remove the line above if you are submitting to GradeScope for a grade. But leave it if you only want to check
+﻿// Remove the line above if you are submitting to GradeScope for a grade. But leave it if you only want to check
 // that your code compiles and the autograder can access your public methods.
 
 using System;
@@ -220,7 +219,7 @@ namespace GameAI
             {
                 // TODO: Add some rules.
                 If(FzInputAim.Left).Then(FzOutputWheel.TurnLeft),
-                If(Very(FzInputAim.Straight)).Then(FzOutputWheel.GoStraight),
+                If((FzInputAim.Straight)).Then(FzOutputWheel.GoStraight),
                 If(FzInputAim.Right).Then(FzOutputWheel.TurnRight),
             };
 
