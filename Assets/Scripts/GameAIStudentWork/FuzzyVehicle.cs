@@ -36,7 +36,7 @@ namespace GameAI
         enum FzOutputThrottle {Brake, Coast, Accelerate }
         enum FzOutputWheel { TurnLeft, GoStraight, TurnRight }
 
-        enum FzInputSpeed { Slow, Medium, Fast }
+        enum FzInputSpeed { Slow, MedSlow, Medium, Fast }
         enum FzInputAim { Left, Straight, Right }
 
         FuzzySet<FzInputAim> fzAimSet;
@@ -77,7 +77,10 @@ namespace GameAI
             // replace the following:
 
             // Slow
-            const float slow = 10f;
+            const float slow = 5f;
+
+            // Medium Slow
+            const float medSlow = 15f;
 
             // Medium
             const float medium = 25f;
@@ -86,7 +89,7 @@ namespace GameAI
             const float fast = 50f;
 
             //set = new FuzzySet<FzInputSpeed>();
-            set = GenerateCrossfadeFuzzySet<FzInputSpeed>(slow, medium, fast);
+            set = GenerateCrossfadeFuzzySet<FzInputSpeed>(slow, medSlow, medium, fast);
 
             // You can then print the ASCII visualization for debugging:
             // Debug.Log(RenderFuzzySetAscii(set));
@@ -165,7 +168,7 @@ namespace GameAI
             const float right = 20f;
 
             //set = new FuzzySet<FzOutputThrottle>();
-            set = GenerateDiscreteFuzzySet<FzInputAim>(left, straight, right);
+            set = GenerateCrossfadeFuzzySet<FzInputAim>(left, straight, right);
 
             // You may test with: Debug.Log(RenderFuzzySetAscii(set));
 
@@ -210,6 +213,17 @@ namespace GameAI
             return new FuzzyRuleSet<FzOutputWheel>(wheel, rules);
         }
 
+        private float GetAimAngle()
+        {
+            Vector3 target = FlattenVector(Racetrack.GetPointAhead(10f));
+
+            // Get the vectr from car to target and flatten it
+            Vector3 vectorToTarget = target - FlattenVector(carPosition);
+
+            // Get angle
+            float angle = Vector3.SignedAngle(FlattenVector(carForward), vectorToTarget, Vector3.up);
+            return angle;
+        }
 
         protected override void Awake()
         {
@@ -253,20 +267,21 @@ namespace GameAI
             UpdatePosition();
 
             // Pick taret down track
-            Vector3 target = FlattenVector(Racetrack.GetPointAhead(10f));
+            //Vector3 target = FlattenVector(Racetrack.GetPointAhead(10f));
 
-            // Get the vectr from car to target and flatten it
-            Vector3 vectorToTarget = target - FlattenVector(carPosition);
+            //// Get the vectr from car to target and flatten it
+            //Vector3 vectorToTarget = target - FlattenVector(carPosition);
 
-            // Get angle
-            float angle = Vector3.SignedAngle(FlattenVector(carForward), vectorToTarget, Vector3.up);
+            //// Get angle
+            //float angle = Vector3.SignedAngle(FlattenVector(carForward), vectorToTarget, Vector3.up);
 
 
             //HardCodeSteering(0f);
             //HardCodeThrottle(0.5f);
-            
+
             // Simple example of fuzzification of vehicle state
             // The Speed is fuzzified and stored in fzInputValueSet
+            float angle = GetAimAngle();
             fzSpeedSet.Evaluate(Speed, fzInputValueSet);
             fzAimSet.Evaluate(angle, fzInputValueSet);
 
@@ -319,6 +334,10 @@ namespace GameAI
         {
             if (Racetrack == null || !Racetrack.IsInitialized)
                 return;
+            float angle = GetAimAngle();
+            inputs.Add(Speed);
+            inputs.Add(angle);
+
 
             // TODO for the NN part, e.g.:
             // YourCrispValueCalculationHelper();   // the same helper method UpdateControls() calls
