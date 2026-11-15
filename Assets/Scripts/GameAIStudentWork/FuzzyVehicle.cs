@@ -193,11 +193,11 @@ namespace GameAI
                 If(FzInputSpeed.Slow).Then(FzOutputThrottle.Accelerate),
 
                 If(And(FzInputSpeed.MedSlow, FzInputAim.Straight)).Then(FzOutputThrottle.Accelerate),
-                If(And(FzInputSpeed.MedSlow, FzInputAim.Left)).Then(FzOutputThrottle.Coast),
-                If(And(FzInputSpeed.MedSlow, FzInputAim.Right)).Then(FzOutputThrottle.Coast),
+                If(And(FzInputSpeed.MedSlow, FzInputAim.Left)).Then(FzOutputThrottle.Brake),
+                If(And(FzInputSpeed.MedSlow, FzInputAim.Right)).Then(FzOutputThrottle.Brake),
 
                 //If(FzInputSpeed.MedSlow).Then(FzOutputThrottle.Accelerate),
-                If(And(FzInputSpeed.Medium, FzInputAim.Straight)).Then(FzOutputThrottle.Brake),
+                If(And(FzInputSpeed.Medium, FzInputAim.Straight)).Then(FzOutputThrottle.Coast),
                 If(And(FzInputSpeed.Medium, FzInputAim.Left)).Then(FzOutputThrottle.Brake),
                 If(And(FzInputSpeed.Medium, FzInputAim.Right)).Then(FzOutputThrottle.Brake),
 
